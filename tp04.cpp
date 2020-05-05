@@ -24,7 +24,8 @@ TAREA* buscarPorId(TAREA**, int, int);
 int main() {
     srand(time(NULL));
     int cantTareas;
-    int tareaID;
+    int buscarID;
+    char buscarPalabra[100];
     TAREA** tareasPendientes;
     TAREA** tareasRealizadas;
 
@@ -41,10 +42,42 @@ int main() {
 
     cargaTareas(tareasPendientes, cantTareas);
     check(tareasPendientes, tareasRealizadas, cantTareas);
-    cout << "# Mostrando tareas realizadas\n";
+    cout << "-- Mostrando tareas realizadas\n";
     mostrar(tareasRealizadas, cantTareas);
-    cout << "# Mostrando tareas pendientes\n";
+    cout << "-- Mostrando tareas pendientes\n";
     mostrar(tareasPendientes, cantTareas);
+
+    cout << ">> Filtrar tarea por palabra: ";
+    cin >> buscarPalabra;
+    cout << "-- Buscando en tareas pendientes...\n";
+    if (buscarPorPalabra(tareasPendientes, buscarPalabra, cantTareas) != NULL) {
+        mostrarTarea(buscarPorPalabra(tareasPendientes, buscarPalabra, cantTareas));
+    } else {
+        cout << "No existe tarea con la palabra \"" << buscarPalabra << "\"" << " en la lista de tareas pendientes\n";
+    }
+    cout << "\n-- Buscando en tareas realizadas...\n";
+    if (buscarPorPalabra(tareasRealizadas, buscarPalabra, cantTareas) != NULL) {
+        mostrarTarea(buscarPorPalabra(tareasRealizadas, buscarPalabra, cantTareas));
+    } else {
+        cout << "No existe tarea con la palabra \"" << buscarPalabra << "\"" << " en la lista de tareas realizadas";
+    }
+
+    cout << "\n>> Filtrar tarea por id: ";
+    cin >> buscarID;
+    cout << "-- Buscando en tareas pendientes...\n";
+    if (buscarPorId(tareasPendientes, buscarID, cantTareas) != NULL) {
+        mostrarTarea(buscarPorId(tareasPendientes, buscarID, cantTareas));
+    } else {
+        cout << "No existe tarea con id " << buscarID << " en la lista de tareas pendientes\n";
+    }
+    cout << "\n-- Buscando en tareas realizadas...\n";
+    if (buscarPorId(tareasRealizadas, buscarID, cantTareas) != NULL) {
+        mostrarTarea(buscarPorId(tareasRealizadas, buscarID, cantTareas));
+    } else {
+        cout << "No existe tarea con id " << buscarID << " en la lista de tareas realizadas";
+    }
+
+    cout << "\n";
 
     delete[] tareasPendientes;
     delete[] tareasRealizadas;
@@ -95,7 +128,7 @@ void check(TAREA** tareasPendientes, TAREA** tareasRealizadas, int cantTareas) {
     char respuesta;
     for (int i = 0; i < cantTareas; i++) {
         do {
-            cout << "-- La tarea #" << tareasPendientes[i]->id << " fue realizada? SI[Y] NO[N]: ";
+            cout << ">> La tarea #" << tareasPendientes[i]->id << " fue realizada? SI[Y] NO[N]: ";
             cin >> respuesta;
             if (respuesta != 'Y' && respuesta != 'N') {
                 cout << "!Error: respuesta incorrecta\n";
