@@ -29,6 +29,7 @@ int main() {
     TAREA** tareasPendientes;
     TAREA** tareasRealizadas;
 
+    // cantidad de tareas
     do {
         cout << ">> Ingrese la cantidad de tareas: ";
         cin >> cantTareas;
@@ -37,17 +38,25 @@ int main() {
         }
     } while(cantTareas < 0);
 
+    // reserva dinamica de memoria
     tareasPendientes = new TAREA*[cantTareas];
     tareasRealizadas = new TAREA*[cantTareas];
 
+    // carga de tareas
     cargaTareas(tareasPendientes, cantTareas);
+
+    // pregunta si la tarea fue realizada
     check(tareasPendientes, tareasRealizadas, cantTareas);
+
+    // muestra las tareas realizadas
     cout << "-- Mostrando tareas realizadas\n";
     mostrar(tareasRealizadas, cantTareas);
+    // muestra las tareas pendientes
     cout << "-- Mostrando tareas pendientes\n";
     mostrar(tareasPendientes, cantTareas);
 
-    cout << ">> Filtrar tarea por palabra: ";
+    // buscar tarea por palabra
+    cout << ">> Buscar tarea por palabra: ";
     cin >> buscarPalabra;
     cout << "-- Buscando en tareas pendientes...\n";
     if (buscarPorPalabra(tareasPendientes, buscarPalabra, cantTareas) != NULL) {
@@ -62,7 +71,8 @@ int main() {
         cout << "No existe tarea con la palabra \"" << buscarPalabra << "\"" << " en la lista de tareas realizadas";
     }
 
-    cout << "\n>> Filtrar tarea por id: ";
+    // buscar tarea por id
+    cout << "\n>> Buscar tarea por id: ";
     cin >> buscarID;
     cout << "-- Buscando en tareas pendientes...\n";
     if (buscarPorId(tareasPendientes, buscarID, cantTareas) != NULL) {
@@ -79,6 +89,7 @@ int main() {
 
     cout << "\n";
 
+    // liberar memoria reservada
     delete[] tareasPendientes;
     delete[] tareasRealizadas;
     return 0;
