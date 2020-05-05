@@ -18,6 +18,7 @@ void cargaTareas(TAREA**, int);
 void mostrarTarea(TAREA*);
 void mostrar(TAREA**, int);
 void check(TAREA**, TAREA**, int);
+TAREA* buscarTarea(TAREA**, char*, int);
 
 int main() {
     srand(time(NULL));
@@ -56,7 +57,8 @@ void cargaTareas(TAREA** tarea, int cantTareas) {
         tarea[i]->id = i + 1;
 
         cout << "\n>> Descripcion: ";
-        cin >> auxDescr;
+        cin.ignore();
+        cin.getline(auxDescr, 100);
         tarea[i]->descripcion = new char[strlen(auxDescr) + 1];
         strcpy(tarea[i]->descripcion, auxDescr);
 
@@ -106,4 +108,13 @@ void check(TAREA** tareaPendiente, TAREA** tareaRealizada, int cantTareas) {
         }
     }
     cout << "\n";
+}
+
+TAREA* buscarTarea(TAREA** tareas, char* palabra, int cantTareas) {
+    for (int i = 0; i < cantTareas; i++) {
+        if (tareas[i] != NULL && strstr(tareas[i]->descripcion, palabra) != NULL) {
+            return tareas[i];
+        }
+    }
+    return NULL;
 }
