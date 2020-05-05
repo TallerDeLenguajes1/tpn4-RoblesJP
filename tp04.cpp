@@ -15,6 +15,8 @@ typedef struct {
 
 // funciones
 void cargaTareas(TAREA**, int);
+void mostrar(TAREA**, int);
+void mostrarTarea(TAREA*);
 
 int main() {
     srand(time(NULL));
@@ -23,7 +25,6 @@ int main() {
     TAREA** tareasRealizadas;
 
     do {
-        cin.clear();
         cout << ">> Ingrese la cantidad de tareas: ";
         cin >> cantTareas;
         if (cantTareas < 0) {
@@ -35,29 +36,44 @@ int main() {
     tareasRealizadas = new TAREA*[cantTareas];
 
     cargaTareas(tareas, cantTareas);
-
+    cout << "# Mostrando tareas\n";
+    mostrar(tareas, cantTareas);
 
     return 0;
 }
 
-void cargaTareas(TAREA** tareas, int cantTareas) {
+void cargaTareas(TAREA** tarea, int cantTareas) {
     for (int i = 0; i < cantTareas; i++) {
-        cout << "\n# TAREA #" << i + 1;
-        tareas[i] = new TAREA;
-        tareas[i]->id = i + 1;
+        cout << "\n## TAREA #" << i + 1;
+        tarea[i] = new TAREA;
+        tarea[i]->id = i + 1;
 
         char auxDescr[30];
         cout << "\n>> Descripcion: ";
         cin >> auxDescr;
-        tareas[i]->descripcion = new char[strlen(auxDescr) + 1];
-        strcpy(tareas[i]->descripcion, auxDescr);
+        tarea[i]->descripcion = new char[strlen(auxDescr) + 1];
+        strcpy(tarea[i]->descripcion, auxDescr);
 
         do {
             cout << ">> Duracion: ";
-            cin >> tareas[i]->duracion;
-            if (tareas[i]->duracion < 10 || tareas[i]->duracion > 100) {
+            cin >> tarea[i]->duracion;
+            if (tarea[i]->duracion < 10 || tarea[i]->duracion > 100) {
                 cout << "!Error: la duracion suele puede ser entre 10 y 100\n";
             }
-        } while (tareas[i]->duracion < 10 || tareas[i]->duracion > 100);
+        } while (tarea[i]->duracion < 10 || tarea[i]->duracion > 100);
     }
+    cout << "\n";
+}
+
+void mostrar(TAREA** tarea, int cantTareas) {
+    for (int i = 0; i < cantTareas; i++) {
+        mostrarTarea(tarea[i]);
+        cout << "\n";
+    }
+}
+
+void mostrarTarea(TAREA* tarea) {
+    cout << "## TareaID: " << tarea->id;
+    cout << "\n# Descripcion: " << tarea->descripcion;
+    cout << "\n# Duracion: " << tarea->duracion << "\n";
 }
