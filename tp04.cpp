@@ -18,7 +18,7 @@ void cargaTareas(TAREA**, int);
 void mostrarTarea(TAREA*);
 void mostrar(TAREA**, int);
 void check(TAREA**, TAREA**, int);
-TAREA* buscarTarea(TAREA**, char*, int);
+TAREA* buscarPorPalabra(TAREA**, char*, int);
 
 int main() {
     srand(time(NULL));
@@ -110,7 +110,7 @@ void check(TAREA** tareaPendiente, TAREA** tareaRealizada, int cantTareas) {
     cout << "\n";
 }
 
-TAREA* buscarTarea(TAREA** tareas, char* palabra, int cantTareas) {
+TAREA* buscarPorPalabra(TAREA** tareas, char* palabra, int cantTareas) {
     for (int i = 0; i < cantTareas; i++) {
         if (tareas[i] != NULL && strstr(tareas[i]->descripcion, palabra) != NULL) {
             return tareas[i];
