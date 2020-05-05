@@ -15,13 +15,14 @@ typedef struct {
 
 // funciones
 void cargaTareas(TAREA**, int);
-void mostrar(TAREA**, int);
 void mostrarTarea(TAREA*);
+void mostrar(TAREA**, int);
+void check(TAREA**, TAREA**, int);
 
 int main() {
     srand(time(NULL));
     int cantTareas;
-    TAREA** tareas;
+    TAREA** tareasPendientes;
     TAREA** tareasRealizadas;
 
     do {
@@ -32,23 +33,28 @@ int main() {
         }
     } while(cantTareas < 0);
 
-    tareas = new TAREA*[cantTareas];
+    tareasPendientes = new TAREA*[cantTareas];
     tareasRealizadas = new TAREA*[cantTareas];
 
-    cargaTareas(tareas, cantTareas);
-    cout << "# Mostrando tareas\n";
-    mostrar(tareas, cantTareas);
+    cargaTareas(tareasPendientes, cantTareas);
+    check(tareasPendientes, tareasRealizadas, cantTareas);
+    cout << "# Mostrando tareas realizadas\n";
+    mostrar(tareasRealizadas, cantTareas);
+    cout << "# Mostrando tareas pendientes\n";
+    mostrar(tareasPendientes, cantTareas);
 
+    delete[] tareasPendientes;
+    delete[] tareasRealizadas;
     return 0;
 }
 
 void cargaTareas(TAREA** tarea, int cantTareas) {
+    char auxDescr[100];
     for (int i = 0; i < cantTareas; i++) {
         cout << "\n## TAREA #" << i + 1;
         tarea[i] = new TAREA;
         tarea[i]->id = i + 1;
 
-        char auxDescr[30];
         cout << "\n>> Descripcion: ";
         cin >> auxDescr;
         tarea[i]->descripcion = new char[strlen(auxDescr) + 1];
@@ -65,15 +71,39 @@ void cargaTareas(TAREA** tarea, int cantTareas) {
     cout << "\n";
 }
 
-void mostrar(TAREA** tarea, int cantTareas) {
-    for (int i = 0; i < cantTareas; i++) {
-        mostrarTarea(tarea[i]);
-        cout << "\n";
-    }
-}
-
 void mostrarTarea(TAREA* tarea) {
     cout << "## TareaID: " << tarea->id;
     cout << "\n# Descripcion: " << tarea->descripcion;
     cout << "\n# Duracion: " << tarea->duracion << "\n";
+}
+
+void mostrar(TAREA** tarea, int cantTareas) {
+    for (int i = 0; i < cantTareas; i++) {
+        if (tarea[i] != NULL) {
+            mostrarTarea(tarea[i]);
+            cout << "\n";
+        }
+    }
+    cout << "\n";
+}
+
+void check(TAREA** tareaPendiente, TAREA** tareaRealizada, int cantTareas) {
+    char respuesta;
+    for (int i = 0; i < cantTareas; i++) {
+        do {
+            cout << "-- La tarea #" << tareaPendiente[i]->id << " fue realizada? SI[Y] NO[N]: ";
+            cin >> respuesta;
+            if (respuesta != 'Y' && respuesta != 'N') {
+                cout << "!Error: respuesta incorrecta\n";
+            } 
+        } while (respuesta != 'Y' && respuesta != 'N');
+
+        if (respuesta == 'Y') {
+            tareaRealizada[i] = tareaPendiente[i];
+            tareaPendiente[i] = NULL;
+        } else {
+            tareaRealizada[i] = NULL;
+        }
+    }
+    cout << "\n";
 }
