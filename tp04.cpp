@@ -18,7 +18,7 @@ void cargaTareas(TAREA**, int);
 void mostrarTarea(TAREA*);
 void mostrar(TAREA**, int);
 void check(TAREA**, TAREA**, int);
-TAREA* buscarTarea(TAREA**, int, int);
+TAREA* buscarPorId(TAREA**, int, int);
 
 int main() {
     srand(time(NULL));
@@ -110,7 +110,7 @@ void check(TAREA** tareasPendientes, TAREA** tareasRealizadas, int cantTareas) {
     cout << "\n";
 }
 
-TAREA* buscarTarea(TAREA** tareas, int id, int cantTareas) {
+TAREA* buscarPorId(TAREA** tareas, int id, int cantTareas) {
     for (int i = 0; i < cantTareas; i++) {
         if (tareas[i] != NULL && tareas[i]->id == id) {
             return tareas[i];
