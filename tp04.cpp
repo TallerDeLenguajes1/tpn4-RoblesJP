@@ -13,21 +13,31 @@ typedef struct {
     int duracion; // [10, 100]
 } TAREA;
 
+struct NODO {
+    TAREA* tarea;
+    struct NODO* siguiente;
+};
+typedef struct NODO* LISTA;
+
 // funciones
-void cargaTareas(TAREA**, int);
-void mostrarTarea(TAREA*);
-void mostrar(TAREA**, int);
-void check(TAREA**, TAREA**, int);
-TAREA* buscarPorPalabra(TAREA**, char*, int);
-TAREA* buscarPorId(TAREA**, int, int);
+LISTA crearLista();
+TAREA* crearTarea(int, char*, int);
+struct NODO* crearNodo(TAREA*);
+void insertarNodo(LISTA*, struct NODO*);
+struct NODO* quitarNodo(LISTA*);
+void mostrarTarea(TAREA* tarea);
+void mostrar(LISTA L);
+TAREA* buscarPorPalabra(LISTA, char*);
+TAREA* buscarPorId(LISTA, int);
 
 int main() {
     srand(time(NULL));
     int cantTareas;
     int buscarID;
     char buscarPalabra[100];
-    TAREA** tareasPendientes;
-    TAREA** tareasRealizadas;
+    LISTA tareas = crearLista();
+    LISTA tareasPendientes = crearLista();
+    LISTA tareasRealizadas = crearLista();
 
     // cantidad de tareas
     do {
@@ -38,108 +48,32 @@ int main() {
         }
     } while(cantTareas < 0);
 
-    // reserva dinamica de memoria
-    tareasPendientes = new TAREA*[cantTareas];
-    tareasRealizadas = new TAREA*[cantTareas];
-
     // carga de tareas
-    cargaTareas(tareasPendientes, cantTareas);
-
-    // pregunta si la tarea fue realizada
-    check(tareasPendientes, tareasRealizadas, cantTareas);
-
-    // muestra las tareas realizadas
-    cout << "-- Mostrando tareas realizadas\n";
-    mostrar(tareasRealizadas, cantTareas);
-    // muestra las tareas pendientes
-    cout << "-- Mostrando tareas pendientes\n";
-    mostrar(tareasPendientes, cantTareas);
-
-    // buscar tarea por palabra
-    cout << ">> Buscar tarea por palabra: ";
-    cin >> buscarPalabra;
-    cout << "-- Buscando en tareas pendientes...\n";
-    if (buscarPorPalabra(tareasPendientes, buscarPalabra, cantTareas) != NULL) {
-        mostrarTarea(buscarPorPalabra(tareasPendientes, buscarPalabra, cantTareas));
-    } else {
-        cout << "No existe tarea con la palabra \"" << buscarPalabra << "\"" << " en la lista de tareas pendientes\n";
-    }
-    cout << "\n-- Buscando en tareas realizadas...\n";
-    if (buscarPorPalabra(tareasRealizadas, buscarPalabra, cantTareas) != NULL) {
-        mostrarTarea(buscarPorPalabra(tareasRealizadas, buscarPalabra, cantTareas));
-    } else {
-        cout << "No existe tarea con la palabra \"" << buscarPalabra << "\"" << " en la lista de tareas realizadas";
-    }
-
-    // buscar tarea por id
-    cout << "\n>> Buscar tarea por id: ";
-    cin >> buscarID;
-    cout << "-- Buscando en tareas pendientes...\n";
-    if (buscarPorId(tareasPendientes, buscarID, cantTareas) != NULL) {
-        mostrarTarea(buscarPorId(tareasPendientes, buscarID, cantTareas));
-    } else {
-        cout << "No existe tarea con id " << buscarID << " en la lista de tareas pendientes\n";
-    }
-    cout << "\n-- Buscando en tareas realizadas...\n";
-    if (buscarPorId(tareasRealizadas, buscarID, cantTareas) != NULL) {
-        mostrarTarea(buscarPorId(tareasRealizadas, buscarID, cantTareas));
-    } else {
-        cout << "No existe tarea con id " << buscarID << " en la lista de tareas realizadas";
-    }
-
-    cout << "\n";
-
-    // liberar memoria reservada
-    delete[] tareasPendientes;
-    delete[] tareasRealizadas;
-    return 0;
-}
-
-void cargaTareas(TAREA** tareas, int cantTareas) {
-    char auxDescr[100];
     for (int i = 0; i < cantTareas; i++) {
         cout << "\n## TAREA #" << i + 1;
-        tareas[i] = new TAREA;
-        tareas[i]->id = i + 1;
-
+        int id = i + 1;
+        char descripcion[50];
         cout << "\n>> Descripcion: ";
-        cin.ignore();
-        cin.getline(auxDescr, 100);
-        tareas[i]->descripcion = new char[strlen(auxDescr) + 1];
-        strcpy(tareas[i]->descripcion, auxDescr);
-
+        cin >> descripcion;
+        int duracion;
         do {
             cout << ">> Duracion: ";
-            cin >> tareas[i]->duracion;
-            if (tareas[i]->duracion < 10 || tareas[i]->duracion > 100) {
+            cin >> duracion;
+            if (duracion < 10 || duracion > 100) {
                 cout << "!Error: la duracion suele puede ser entre 10 y 100\n";
             }
-        } while (tareas[i]->duracion < 10 || tareas[i]->duracion > 100);
+        } while (duracion < 10 || duracion > 100);
+
+        TAREA* nuevaTarea = crearTarea(id, descripcion, duracion);
+        insertarNodo(&tareas, crearNodo(nuevaTarea));
     }
     cout << "\n";
-}
 
-void mostrarTarea(TAREA* tarea) {
-    cout << "## TareaID: " << tarea->id;
-    cout << "\n# Descripcion: " << tarea->descripcion;
-    cout << "\n# Duracion: " << tarea->duracion << "\n";
-}
-
-void mostrar(TAREA** tareas, int cantTareas) {
-    for (int i = 0; i < cantTareas; i++) {
-        if (tareas[i] != NULL) {
-            mostrarTarea(tareas[i]);
-            cout << "\n";
-        }
-    }
-    cout << "\n";
-}
-
-void check(TAREA** tareasPendientes, TAREA** tareasRealizadas, int cantTareas) {
+    // pregunta si la tarea fue realizada
     char respuesta;
-    for (int i = 0; i < cantTareas; i++) {
+    while (tareas != NULL) {
         do {
-            cout << ">> La tarea #" << tareasPendientes[i]->id << " fue realizada? SI[Y] NO[N]: ";
+            cout << ">> La tarea #" << tareas->tarea->id << " fue realizada? SI[Y] NO[N]: ";
             cin >> respuesta;
             if (respuesta != 'Y' && respuesta != 'N') {
                 cout << "!Error: respuesta incorrecta\n";
@@ -147,29 +81,118 @@ void check(TAREA** tareasPendientes, TAREA** tareasRealizadas, int cantTareas) {
         } while (respuesta != 'Y' && respuesta != 'N');
 
         if (respuesta == 'Y') {
-            tareasRealizadas[i] = tareasPendientes[i];
-            tareasPendientes[i] = NULL;
+            insertarNodo(&tareasRealizadas, quitarNodo(&tareas));
         } else {
-            tareasRealizadas[i] = NULL;
+            insertarNodo(&tareasPendientes, quitarNodo(&tareas));
         }
     }
+
+    // muestra las tareas realizadas
+    cout << "\n-- Mostrando tareas realizadas\n";
+    mostrar(tareasRealizadas);
+    // muestra las tareas pendientes
+    cout << "-- Mostrando tareas pendientes\n";
+    mostrar(tareasPendientes);
+
+    
+    // buscar tarea por palabra
+    cout << ">> Buscar tarea por palabra: ";
+    cin >> buscarPalabra;
+    cout << "-- Buscando en tareas pendientes...\n";
+    if (buscarPorPalabra(tareasPendientes, buscarPalabra) != NULL) {
+        mostrarTarea(buscarPorPalabra(tareasPendientes, buscarPalabra));
+    } else {
+        cout << "No existe tarea con la palabra \"" << buscarPalabra << "\"" << " en la lista de tareas pendientes\n";
+    }
+    cout << "-- Buscando en tareas realizadas...\n";
+    if (buscarPorPalabra(tareasRealizadas, buscarPalabra) != NULL) {
+        mostrarTarea(buscarPorPalabra(tareasRealizadas, buscarPalabra));
+    } else {
+        cout << "No existe tarea con la palabra \"" << buscarPalabra << "\"" << " en la lista de tareas realizadas";
+    }
+
+    // buscar tarea por id
+    cout << ">> Buscar tarea por id: ";
+    cin >> buscarID;
+    cout << "-- Buscando en tareas pendientes...\n";
+    if (buscarPorId(tareasPendientes, buscarID) != NULL) {
+        mostrarTarea(buscarPorId(tareasPendientes, buscarID));
+    } else {
+        cout << "No existe tarea con id " << buscarID << " en la lista de tareas pendientes\n\n";
+    }
+    cout << "-- Buscando en tareas realizadas...\n";
+    if (buscarPorId(tareasRealizadas, buscarID) != NULL) {
+        mostrarTarea(buscarPorId(tareasRealizadas, buscarID));
+    } else {
+        cout << "No existe tarea con id " << buscarID << " en la lista de tareas realizadas";
+    }
+
+    cout << "\n";
+    return 0;
+}
+
+LISTA crearLista() {
+    return NULL;
+}
+
+TAREA* crearTarea(int id, char* descripcion, int duracion) {
+    TAREA* nuevaTarea = new TAREA;
+    nuevaTarea->id = id;
+    nuevaTarea->descripcion = descripcion;
+    nuevaTarea->duracion = duracion;
+    return nuevaTarea;
+}
+
+struct NODO* crearNodo(TAREA* tarea) {
+    struct NODO* nuevoNodo = new struct NODO;
+    nuevoNodo->tarea = tarea;
+    nuevoNodo->siguiente = NULL;
+    return nuevoNodo;
+}
+
+void insertarNodo(LISTA* L, struct NODO* nodo) {
+    nodo->siguiente = *L;
+    *L = nodo;
+}
+
+struct NODO* quitarNodo(LISTA* L) {
+    struct NODO* aux;
+    aux = *L;
+    *L = (*L)->siguiente;
+    aux->siguiente = NULL;
+    return aux;
+}
+
+void mostrarTarea(TAREA* tarea) {
+    cout << "## TareaID: " << tarea->id;
+    cout << "\n# Descripcion: " << tarea->descripcion;
+    cout << "\n# Duracion: " << tarea->duracion << "\n";
     cout << "\n";
 }
 
-TAREA* buscarPorPalabra(TAREA** tareas, char* palabra, int cantTareas) {
-    for (int i = 0; i < cantTareas; i++) {
-        if (tareas[i] != NULL && strstr(tareas[i]->descripcion, palabra) != NULL) {
-            return tareas[i];
+void mostrar(LISTA L) {
+    while (L != NULL) {
+        mostrarTarea(L->tarea);
+        L = L->siguiente;
+    }
+}   
+
+TAREA* buscarPorPalabra(LISTA L, char* palabra) {
+    while (L != NULL) {
+        if (strstr(L->tarea->descripcion, palabra) != NULL) {
+            return L->tarea;
         }
+        L = L->siguiente;
     }
     return NULL;
 }
 
-TAREA* buscarPorId(TAREA** tareas, int id, int cantTareas) {
-    for (int i = 0; i < cantTareas; i++) {
-        if (tareas[i] != NULL && tareas[i]->id == id) {
-            return tareas[i];
+TAREA* buscarPorId(LISTA L, int id) {
+     while (L != NULL) {
+        if (L->tarea->id == id) {
+            return L->tarea;
         }
+        L = L->siguiente;
     }
     return NULL;
 }
