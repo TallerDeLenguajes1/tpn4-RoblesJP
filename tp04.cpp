@@ -1,9 +1,5 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstring>
 #include <iostream>
-#include <string.h>
-#include <time.h>
-
 using namespace std;
 
 // estructuras
@@ -31,7 +27,6 @@ TAREA* buscarPorPalabra(LISTA, char*);
 TAREA* buscarPorId(LISTA, int);
 
 int main() {
-    srand(time(NULL));
     int cantTareas;
     int buscarID;
     char buscarPalabra[100];
@@ -63,9 +58,9 @@ int main() {
                 cout << "!Error: la duracion suele puede ser entre 10 y 100\n";
             }
         } while (duracion < 10 || duracion > 100);
-
         TAREA* nuevaTarea = crearTarea(id, descripcion, duracion);
-        insertarNodo(&tareas, crearNodo(nuevaTarea));
+        struct NODO* nuevoNodo = crearNodo(nuevaTarea);
+        insertarNodo(&tareas, nuevoNodo);
     }
     cout << "\n";
 
